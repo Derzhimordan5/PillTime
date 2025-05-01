@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PillTime.Views.AddMedicinePage"
+             Title="Добавить лекарство"
+             BackgroundColor="#f9f9f9">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <!-- Название лекарства -->
+            <Frame BackgroundColor="White" CornerRadius="10" Padding="5" HasShadow="False">
+                <Entry x:Name="NameEntry"
+                       Placeholder="Название лекарства"
+                       BackgroundColor="Transparent"
+                       TextColor="Black"
+                       PlaceholderColor="Gray"/>
+            </Frame>
+
+            <!-- Выбор способа добавления -->
+            <Frame BackgroundColor="White" CornerRadius="10" Padding="5" HasShadow="False">
+                <Picker x:Name="ModePicker"
+                        Title="Способ добавления"
+                        SelectedIndexChanged="OnModeChanged"
+                        BackgroundColor="Transparent"
+                        TextColor="Black">
+                    <Picker.ItemsSource>
+                        <x:Array Type="{x:Type x:String}">
+                            <x:String>По назначению врача</x:String>
+                            <x:String>Рассчитать курс самостоятельно</x:String>
+                        </x:Array>
+                    </Picker.ItemsSource>
+                </Picker>
+            </Frame>
+
+            <!-- Блок "По назначению врача" -->
+            <StackLayout x:Name="DoctorBlock" IsVisible="False" Spacing="10">
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="5" HasShadow="False">
+                    <Entry x:Name="PackageCountEntry" Placeholder="Количество единиц в упаковке (число)"
+                           Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" PlaceholderColor="Gray"/>
+                </Frame>
+
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="5" HasShadow="False">
+                    <Entry x:Name="DosePerIntakeEntry" Placeholder="Доза за один приём (например, 1 таблетка)"
+                           BackgroundColor="Transparent" TextColor="Black" PlaceholderColor="Gray"/>
+                </Frame>
+
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="5" HasShadow="False">
+                    <Entry x:Name="IntakesPerDayEntry" Placeholder="Количество приёмов в день (число)"
+                           Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" PlaceholderColor="Gray"/>
+                </Frame>
+
+                <!-- Новый выбор времени приёмов -->
+                <Label Text="Время приёмов:" FontAttributes="Bold" FontSize="Medium" />
+                <StackLayout x:Name="DoctorTimesStack" Spacing="10" />
+                <Button Text="Добавить время приёма"
+                        Clicked="OnAddDoctorTimeClicked"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        CornerRadius="10"/>
+
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="5" HasShadow="False">
+                    <Entry x:Name="SpecialInstructionsEntry" Placeholder="Особые указания (например, после еды)"
+                           BackgroundColor="Transparent" TextColor="Black" PlaceholderColor="Gray"/>
+                </Frame>
+            </StackLayout>
+
+            <!-- Блок "Самостоятельный курс" -->
+            <StackLayout x:Name="SelfBlock" IsVisible="False" Spacing="10">
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="5" HasShadow="False">
+                    <Entry x:Name="DailyDosePerKgEntry" Placeholder="Норма в сутки (мг/кг/сутки)"
+                           Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" PlaceholderColor="Gray"/>
+                </Frame>
+
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="5" HasShadow="False">
+                    <Entry x:Name="TotalAmountEntry" Placeholder="Общий объём препарата (мг или мл)"
+                           Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" PlaceholderColor="Gray"/>
+                </Frame>
+
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="5" HasShadow="False">
+                    <Entry x:Name="IntakesPerDaySelfEntry" Placeholder="Количество приёмов в день"
+                           Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" PlaceholderColor="Gray"/>
+                </Frame>
+
+                <!-- Новый выбор времени приёмов -->
+                <Label Text="Время приёмов:" FontAttributes="Bold" FontSize="Medium" />
+                <StackLayout x:Name="SelfTimesStack" Spacing="10" />
+                <Button Text="Добавить время приёма"
+                        Clicked="OnAddSelfTimeClicked"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        CornerRadius="10"/>
+
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="5" HasShadow="False">
+                    <Entry x:Name="SpecialInstructionsSelfEntry" Placeholder="Особые указания (например, после еды)"
+                           BackgroundColor="Transparent" TextColor="Black" PlaceholderColor="Gray"/>
+                </Frame>
+            </StackLayout>
+
+            <!-- Кнопка Сохранить -->
+            <Button Text="Сохранить"
+                    Clicked="OnSaveClicked"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

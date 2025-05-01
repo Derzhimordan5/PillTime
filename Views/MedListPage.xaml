@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PillTime.Views.MedListPage"
+             Title="Лекарства"
+             BackgroundColor="White">
+
+    <Grid RowDefinitions="*, Auto" Padding="20" RowSpacing="15">
+
+        <!-- Список лекарств с прокруткой -->
+        <CollectionView x:Name="MedicinesCollection"
+                ItemsSource="{Binding Medicines}"
+                SelectionMode="None"
+                Grid.Row="0">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems>
+                                <SwipeItem Text="Удалить"
+                                   BackgroundColor="Red"
+                                   Invoked="OnDeleteMedicine"
+                                   CommandParameter="{Binding .}" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+
+                        <Frame BorderColor="LightGray" CornerRadius="10" Padding="10" Margin="5" HasShadow="True">
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="20" />
+                                <Label Text="{Binding DosePerIntake, StringFormat='Доза за приём: {0}'}" FontSize="16" />
+                                <Label Text="{Binding IntakesPerDay, StringFormat='Приёмов в день: {0}'}" FontSize="16" />
+                                <Label Text="{Binding PackageCount, StringFormat='В упаковке: {0} шт.'}" FontSize="16" />
+                                <Label Text="{Binding CourseDays, StringFormat='Хватит на {0} дней'}" FontSize="16" TextColor="DarkGreen" />
+                                <Label Text="{Binding SpecialInstructions, StringFormat='Особые указания: {0}'}" FontSize="14" TextColor="Gray" />
+                            </VerticalStackLayout>
+                        </Frame>
+
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+
+        <!-- Кнопка добавления -->
+        <Button Text="Добавить лекарство"
+            FontSize="18"
+            Clicked="OnNavigateToAddMedicinePage"
+            BackgroundColor="#4CAF50"
+            TextColor="White"
+            CornerRadius="10"
+            Grid.Row="1"/>
+
+    </Grid>
+
+
+</ContentPage>
+

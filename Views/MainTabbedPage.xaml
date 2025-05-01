@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:views="clr-namespace:PillTime.Views"
+            x:Class="PillTime.Views.MainTabbedPage"
+            BackgroundColor="White">
+    
+    <TabbedPage.ToolbarItems>
+        <ToolbarItem Text="Профиль" 
+                     IconImageSource="profile_icon.png" 
+                     Clicked="OnProfileClicked" />
+    </TabbedPage.ToolbarItems>
+    
+    <NavigationPage Title="График">
+        <x:Arguments>
+            <views:CalendarPage />
+        </x:Arguments>
+    </NavigationPage>
+
+    <NavigationPage Title="Лекарства">
+        <x:Arguments>
+            <views:MedListPage />
+        </x:Arguments>
+    </NavigationPage>
+
+</TabbedPage>
