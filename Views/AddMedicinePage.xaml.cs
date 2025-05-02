@@ -1,182 +1,291 @@
 using PillTime.Models;
 using Plugin.LocalNotification;
+using System;
+using System.Collections.Generic;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
 
 namespace PillTime.Views
 {
     public partial class AddMedicinePage : ContentPage
     {
+        // Список единиц для врача
+        readonly List<string> _units = new()
+        {
+            "ампула", "грамм", "капля", "капсула", "пакетик", "таблетка"
+        };
+
         public AddMedicinePage()
         {
             InitializeComponent();
+
+            // Наполняем единицы
+            DoctorUnitPicker.ItemsSource = _units;
         }
 
+        // Переключаем блоки в зависимости от выбора режима
         private void OnModeChanged(object sender, EventArgs e)
         {
-            if (ModePicker.SelectedIndex == 0) // По назначению врача
-            {
-                DoctorBlock.IsVisible = true;
-                SelfBlock.IsVisible = false;
-            }
-            else if (ModePicker.SelectedIndex == 1) // Самостоятельный курс
-            {
-                DoctorBlock.IsVisible = false;
-                SelfBlock.IsVisible = true;
-            }
+            bool isDoctor = ModePicker.SelectedIndex == 0;
+            DoctorBlock.IsVisible = isDoctor;
+            SelfBlock.IsVisible = !isDoctor;
         }
 
-        private void OnAddDoctorTimeClicked(object sender, EventArgs e)
+        // При вводе числа приёмов для врача динамически создаём строки
+        private void OnIntakesPerDayChanged(object sender, EventArgs e)
         {
-            var timePicker = new TimePicker
-            {
-                Time = new TimeSpan(8, 0, 0),
-                Format = "HH:mm",
-                BackgroundColor = Colors.White,
-                TextColor = Colors.Black,
-                HeightRequest = 50
-            };
+            DoctorScheduleStack.Children.Clear();
 
-            DoctorTimesStack.Children.Add(timePicker);
+            if (!int.TryParse(IntakesPerDayEntry.Text, out int count) || count <= 0)
+                return;
+
+            for (int i = 1; i <= count; i++)
+            {
+                var timePicker = new TimePicker
+                {
+                    Time = new TimeSpan(8, 0, 0),
+                    Format = "HH:mm"
+                };
+                var doseEntry = new Entry
+                {
+                    Keyboard = Keyboard.Numeric,
+                    Placeholder = $"{i}-я доза ({DoctorUnitPicker.SelectedItem})"
+                };
+                var row = new HorizontalStackLayout
+                {
+                    Spacing = 10,
+                    Children =
+                    {
+                        new Label { Text = $"Приём {i}:", VerticalTextAlignment = TextAlignment.Center },
+                        timePicker,
+                        doseEntry
+                    }
+                };
+                DoctorScheduleStack.Children.Add(row);
+            }
         }
 
-        private void OnAddSelfTimeClicked(object sender, EventArgs e)
+        // При вводе числа приёмов для самостоятельного курса создаём строки
+        private void OnIntakesPerDaySelfChanged(object sender, EventArgs e)
         {
-            var timePicker = new TimePicker
-            {
-                Time = new TimeSpan(8, 0, 0),
-                Format = "HH:mm",
-                BackgroundColor = Colors.White,
-                TextColor = Colors.Black,
-                HeightRequest = 50
-            };
+            SelfScheduleStack.Children.Clear();
 
-            SelfTimesStack.Children.Add(timePicker);
+            if (!int.TryParse(IntakesPerDaySelfEntry.Text, out int count) || count <= 0)
+                return;
+
+            double.TryParse(MaxDailyDosePerKgEntry.Text?.Replace(',', '.'),
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out double maxPerKg);
+
+            double weight = Preferences.Get("Weight", 0.0);
+            double maxDailyDose = weight * maxPerKg;
+            double dosePerIntake = (count > 0) ? maxDailyDose / count : 0;
+
+            for (int i = 1; i <= count; i++)
+            {
+                var timePicker = new TimePicker
+                {
+                    Time = new TimeSpan(8, 0, 0),
+                    Format = "HH:mm"
+                };
+                var doseLabel = new Label
+                {
+                    Text = dosePerIntake > 0 ? $"{dosePerIntake:F2} мг" : $"{i}-я доза: —",
+                    VerticalTextAlignment = TextAlignment.Center
+                };
+                var row = new HorizontalStackLayout
+                {
+                    Spacing = 10,
+                    Children =
+            {
+                new Label { Text = $"Приём {i}:", VerticalTextAlignment = TextAlignment.Center },
+                timePicker,
+                doseLabel
+            }
+                };
+                SelfScheduleStack.Children.Add(row);
+            }
         }
+
 
         private async void OnSaveClicked(object sender, EventArgs e)
         {
-            if (ModePicker.SelectedIndex == -1)
-            {
-                await DisplayAlert("Ошибка", "Выберите способ добавления лекарства.", "ОК");
-                return;
-            }
-
-            string name = NameEntry.Text;
+            string name = NameEntry.Text?.Trim();
             if (string.IsNullOrWhiteSpace(name))
             {
                 await DisplayAlert("Ошибка", "Введите название лекарства.", "ОК");
                 return;
             }
+            var specialInstructions = SpecialInstructionsEntry.Text?.Trim();
 
-            if (ModePicker.SelectedIndex == 0) // По назначению врача
+            // Режим "По назначению врача"
+            if (ModePicker.SelectedIndex == 0)
             {
-                if (int.TryParse(PackageCountEntry.Text, out int packageCount) &&
-                    int.TryParse(IntakesPerDayEntry.Text, out int intakesPerDay))
+                var unit = DoctorUnitPicker.SelectedItem as string;
+                if (unit == null)
                 {
-                    // Собираем время приёмов из DoctorTimesStack
-                    var intakeTimes = new List<string>();
-                    foreach (var child in DoctorTimesStack.Children)
+                    await DisplayAlert("Ошибка", "Выберите единицу измерения.", "ОК");
+                    return;
+                }
+
+                if (!int.TryParse(IntakesPerDayEntry.Text, out int intakesPerDay) || intakesPerDay <= 0)
+                {
+                    await DisplayAlert("Ошибка", "Введите корректное число приёмов в день.", "ОК");
+                    return;
+                }
+
+                var times = new List<string>();
+                var doses = new List<string>();
+                double dailyUsage = 0;
+
+                foreach (var child in DoctorScheduleStack.Children)
+                {
+                    if (child is HorizontalStackLayout row &&
+                        row.Children[1] is TimePicker tp &&
+                        row.Children[2] is Entry de &&
+                        double.TryParse(de.Text?.Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double doseVal))
                     {
-                        if (child is TimePicker tp)
-                            intakeTimes.Add(tp.Time.ToString(@"hh\:mm"));
+                        times.Add(tp.Time.ToString(@"hh\:mm"));
+                        doses.Add($"{doseVal} {unit}");
+                        dailyUsage += doseVal;
                     }
-                    string timesPerDayString = string.Join(", ", intakeTimes);
-
-                    var medicine = new Medicine
-                    {
-                        Name = name,
-                        PackageCount = packageCount,
-                        DosePerIntake = DosePerIntakeEntry.Text,
-                        IntakesPerDay = intakesPerDay,
-                        TimesPerDay = timesPerDayString,
-                        SpecialInstructions = SpecialInstructionsEntry.Text
-                    };
-
-                    await App.Database.SaveMedicineAsync(medicine);
-                    ScheduleMedicineNotifications(medicine.Name, intakeTimes);
-                    await Navigation.PopAsync();
-
                 }
-                else
+
+                if (times.Count != intakesPerDay)
                 {
-                    await DisplayAlert("Ошибка", "Введите корректные числовые значения для упаковки и приёмов в день.", "ОК");
+                    await DisplayAlert("Ошибка", "Не все приёмы заполнены.", "ОК");
+                    return;
                 }
+
+                if (!double.TryParse(StockEntry.Text?.Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double stock) || stock <= 0)
+                {
+                    await DisplayAlert("Ошибка", "Введите корректный запас лекарства.", "ОК");
+                    return;
+                }
+
+                int daysAvailable = dailyUsage > 0 ? (int)Math.Floor(stock / dailyUsage) : 0;
+
+                var med = new Medicine
+                {
+                    Name = name,
+                    Unit = unit,
+                    IntakesPerDay = intakesPerDay,
+                    IntakeTimes = times.ToArray(),
+                    IntakeDoses = doses.ToArray(),
+                    StockAmount = stock,
+                    PackageCount = (int)Math.Floor(stock),
+                    DaysAvailable = daysAvailable,
+                    SpecialInstructions = specialInstructions
+                };
+
+                await App.Database.SaveMedicineAsync(med);
+                ScheduleMedicineNotifications(med.Name, times);
+                await Navigation.PopAsync();
+
             }
-            else if (ModePicker.SelectedIndex == 1) // Самостоятельный курс
+
+            // Режим "Самостоятельный курс"
+            if (ModePicker.SelectedIndex == 1)
             {
-                if (double.TryParse(DailyDosePerKgEntry.Text, out double dailyDosePerKg) &&
-                    double.TryParse(TotalAmountEntry.Text, out double totalAmount) &&
-                    int.TryParse(IntakesPerDaySelfEntry.Text, out int intakesPerDaySelf))
+                var rawMaxPerKg = MaxDailyDosePerKgEntry.Text?.Replace(',', '.') ?? "";
+                var rawIntakesPerDay = IntakesPerDaySelfEntry.Text ?? "";
+                var rawStockSelf = StockSelfEntry.Text?.Replace(',', '.') ?? "";
+
+                if (!double.TryParse(rawMaxPerKg, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double maxPerKg) || maxPerKg <= 0 ||
+                    !int.TryParse(rawIntakesPerDay, out int intakesPerDaySelf) || intakesPerDaySelf <= 0)
                 {
-                    double weight = Preferences.Get("Weight", 0.0);
-                    if (weight == 0.0)
-                    {
-                        await DisplayAlert("Ошибка", "Не указан вес пациента в профиле.", "ОК");
-                        return;
-                    }
-
-                    double dailyDose = weight * dailyDosePerKg;
-                    double days = totalAmount / dailyDose;
-
-                    // Собираем время приёмов из SelfTimesStack
-                    var intakeTimes = new List<string>();
-                    foreach (var child in SelfTimesStack.Children)
-                    {
-                        if (child is TimePicker tp)
-                            intakeTimes.Add(tp.Time.ToString(@"hh\:mm"));
-                    }
-                    string timesPerDayString = string.Join(", ", intakeTimes);
-
-                    var medicine = new Medicine
-                    {
-                        Name = name,
-                        PackageCount = (int)Math.Floor(days),
-                        DosePerIntake = $"{dailyDose / intakesPerDaySelf:F2} мг за приём",
-                        IntakesPerDay = intakesPerDaySelf,
-                        TimesPerDay = timesPerDayString,
-                        SpecialInstructions = SpecialInstructionsSelfEntry.Text
-                    };
-
-                    await App.Database.SaveMedicineAsync(medicine);
-                    ScheduleMedicineNotifications(medicine.Name, intakeTimes);
-                    await Navigation.PopAsync();
-
+                    await DisplayAlert("Ошибка", "Введите корректные данные.", "ОК");
+                    return;
                 }
-                else
+
+                double weight = Preferences.Get("Weight", 0.0);
+                if (weight <= 0)
                 {
-                    await DisplayAlert("Ошибка", "Введите корректные числовые значения для курса.", "ОК");
+                    await DisplayAlert("Ошибка", "Не указан вес пациента в профиле.", "ОК");
+                    return;
                 }
+
+                double maxDailyDose = weight * maxPerKg;
+                double dosePerIntake = maxDailyDose / intakesPerDaySelf;
+
+                var times = new List<string>();
+                var doses = new List<string>();
+
+                foreach (var child in SelfScheduleStack.Children)
+                {
+                    if (child is HorizontalStackLayout row && row.Children[1] is TimePicker tp)
+                    {
+                        times.Add(tp.Time.ToString(@"hh\:mm"));
+                        doses.Add($"{dosePerIntake:F2} мг");
+
+                        if (row.Children[2] is Label lbl)
+                            lbl.Text = $"{dosePerIntake:F2} мг";
+                    }
+                }
+
+                if (times.Count != intakesPerDaySelf)
+                {
+                    await DisplayAlert("Ошибка", "Не все приёмы заполнены.", "ОК");
+                    return;
+                }
+
+                if (!double.TryParse(rawStockSelf, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double stockSelf) || stockSelf <= 0)
+                {
+                    await DisplayAlert("Ошибка", "Введите корректный запас препарата (мг).", "ОК");
+                    return;
+                }
+
+                int daysAvailable = maxDailyDose > 0 ? (int)Math.Floor(stockSelf / maxDailyDose) : 0;
+
+                var med = new Medicine
+                {
+                    Name = name,
+                    Unit = "мг",
+                    IntakesPerDay = intakesPerDaySelf,
+                    IntakeTimes = times.ToArray(),
+                    IntakeDoses = doses.ToArray(),
+                    StockAmount = stockSelf,
+                    PackageCount = (int)Math.Floor(stockSelf), // можешь оставить, если нужно старое поведение
+                    MaxDailyDosePerKg = maxPerKg,
+                    DaysAvailable = daysAvailable,
+                    SpecialInstructions = specialInstructions
+                };
+
+                await App.Database.SaveMedicineAsync(med);
+                ScheduleMedicineNotifications(med.Name, times);
+                await Navigation.PopAsync();
+
             }
+
+
         }
 
+        // Генерация локальных уведомлений
         private void ScheduleMedicineNotifications(string medicineName, List<string> intakeTimes)
         {
-            int notificationId = 1000; // Начинаем с какого-то ID
-
-            foreach (var timeStr in intakeTimes)
+            int id = 1000;
+            foreach (var t in intakeTimes)
             {
-                if (TimeSpan.TryParse(timeStr, out TimeSpan time))
+                if (TimeSpan.TryParse(t, out var time))
                 {
-                    DateTime now = DateTime.Now;
-                    DateTime notifyTime = DateTime.Today.Add(time);
+                    var now = DateTime.Now;
+                    var notifyAt = DateTime.Today.Add(time);
+                    if (notifyAt <= now)
+                        notifyAt = notifyAt.AddDays(1);
 
-                    if (notifyTime <= now)
+                    var req = new NotificationRequest
                     {
-                        notifyTime = notifyTime.AddDays(1);
-                    }
-
-                    var request = new NotificationRequest
-                    {
-                        NotificationId = notificationId++,
-                        Title = "Напоминание о приёме лекарства",
+                        NotificationId = id++,
+                        Title = "Приём лекарства",
                         Description = $"Пора принять {medicineName}",
                         Schedule = new NotificationRequestSchedule
                         {
-                            NotifyTime = notifyTime,
-                            RepeatType = NotificationRepeat.Daily // Повторять каждый день
+                            NotifyTime = notifyAt,
+                            RepeatType = NotificationRepeat.Daily
                         }
                     };
-
-                    Plugin.LocalNotification.NotificationCenter.Current.Show(request);
+                    Plugin.LocalNotification.NotificationCenter.Current.Show(req);
                 }
             }
         }

@@ -13,14 +13,37 @@ public partial class App : Application
 
         if (Preferences.ContainsKey("Weight"))
         {
-            // Если данные уже есть — сразу идём в приложение
             MainPage = new Views.MainTabbedPage();
         }
         else
         {
-            // Иначе показываем заполнение профиля
             MainPage = new Views.UserProfilePage();
         }
+
+        // 💥 Запускаем сброс отметок и пересчёт дней
+        ResetMedicinesForNewDay();
     }
 
+    private async void ResetMedicinesForNewDay()
+    {
+        var today = DateTime.Today.ToString("yyyy-MM-dd");
+        var lastResetDate = Preferences.Get("LastResetDate", "");
+
+        if (lastResetDate == today)
+        {
+            // Уже сбрасывали сегодня — ничего не делаем
+            return;
+        }
+
+        // Обновляем дату сброса
+        Preferences.Set("LastResetDate", today);
+
+        var medicines = await Database.GetMedicinesAsync();
+        foreach (var med in medicines)
+        {
+            med.IsTakenToday = false;
+            med.RecalculateDaysAvailable();
+            await Database.SaveMedicineAsync(med);
+        }
+    }
 }

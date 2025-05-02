@@ -3,19 +3,63 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PillTime.Views.CalendarPage"
              Title="График"
-             BackgroundColor="White">
+             BackgroundColor="Black">
 
     <VerticalStackLayout Padding="20" Spacing="15">
         <CollectionView ItemsSource="{Binding TodayMedicines}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <StackLayout Orientation="Horizontal" Padding="10">
-                        <Label Text="{Binding Name}" FontSize="18" WidthRequest="120"/>
-                        <Label Text="{Binding TimesPerDay}" FontSize="14" WidthRequest="100"/>
-                        <Label Text="{Binding DosePerIntake}" FontSize="14" WidthRequest="80"/>
-                        <CheckBox IsChecked="{Binding IsTakenToday}" 
-                          CheckedChanged="OnMedicineCheckedChanged"/>
-                    </StackLayout>
+                    <Frame BorderColor="#F0F8FF"
+                   CornerRadius="10"
+                   Padding="10"
+                   Margin="5"
+                   HasShadow="True">
+                        <VerticalStackLayout Spacing="5">
+
+                            <!-- Название -->
+                            <Label Text="{Binding Name}"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+
+                            <!-- Вторая строка -->
+                            <Grid ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Особые указания -->
+                                <Label Text="{Binding SpecialInstructions}"
+                               FontSize="14"
+                                VerticalTextAlignment="Center"
+                                Grid.Column="1" />
+
+                                <!-- Доза -->
+                                <Label Text="{Binding NextDoseDescription}"
+                               FontSize="14"
+                               VerticalTextAlignment="Center"
+                               Grid.Column="2" />
+
+                                <!-- Остаток -->
+                                <Label Text="{Binding StockDescription}"
+                               FontSize="14"
+                               VerticalTextAlignment="Center"
+                               Grid.Column="3" />
+
+                                <!-- Чекбокс -->
+                                <CheckBox CheckedChanged="OnMedicineCheckedChanged"
+                                  BindingContext="{Binding .}"
+                                  VerticalOptions="Center"
+                                  Grid.Column="4" />
+                            </Grid>
+
+                        </VerticalStackLayout>
+                    </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
@@ -23,3 +67,4 @@
 
     </VerticalStackLayout>
 </ContentPage>
+

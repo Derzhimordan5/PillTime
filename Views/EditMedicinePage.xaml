@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
-    x:Class="PillTime.Views.AddMedicinePage"
+    x:Class="PillTime.Views.EditMedicinePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Добавить лекарство">
+    Title="Редактировать лекарство">
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
@@ -41,6 +41,7 @@
           Completed="OnIntakesPerDayChanged" />
 
 
+
                 <Label Text="Время и дозировка" />
                 <ScrollView HeightRequest="150">
                     <VerticalStackLayout x:Name="DoctorScheduleStack" Spacing="10" />
@@ -61,8 +62,6 @@
                 <Label Text="Приёмы в день" />
                 <Entry x:Name="IntakesPerDaySelfEntry" Keyboard="Numeric" Completed="OnIntakesPerDaySelfChanged" Unfocused="OnIntakesPerDaySelfChanged" />
 
-           
-
 
                 <Label Text="Время приёма (доза вычисляется автоматически)" />
                 <ScrollView HeightRequest="150">
@@ -79,6 +78,11 @@
         Text="Сохранить"
         FontAttributes="Bold"
         Clicked="OnSaveClicked" />
+            <Button Text="Удалить"
+        BackgroundColor="Red"
+        TextColor="White"
+        Clicked="OnDeleteClicked" />
+
 
         </VerticalStackLayout>
     </ScrollView>

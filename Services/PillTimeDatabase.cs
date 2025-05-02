@@ -18,10 +18,18 @@ namespace PillTime.Services
             return _database.Table<Medicine>().ToListAsync();
         }
 
-        public Task<int> SaveMedicineAsync(Medicine medicine)
+        public async Task SaveMedicineAsync(Medicine medicine)
         {
-            return _database.InsertAsync(medicine);
+            if (medicine.Id != 0)
+            {
+                await _database.UpdateAsync(medicine);
+            }
+            else
+            {
+                await _database.InsertAsync(medicine);
+            }
         }
+
 
         public Task<int> DeleteMedicineAsync(Medicine medicine)
         {

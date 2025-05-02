@@ -55,6 +55,14 @@ public partial class MedListPage : ContentPage
     {
         await Navigation.PushAsync(new AddMedicinePage());
     }
+    private async void OnMedicineSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is Medicine selectedMedicine)
+        {
+            await Navigation.PushAsync(new EditMedicinePage(selectedMedicine));
+            MedicinesCollection.SelectedItem = null;  // сбрасываем выделение
+        }
+    }
 
 
 

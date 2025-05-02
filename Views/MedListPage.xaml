@@ -10,7 +10,8 @@
         <!-- Список лекарств с прокруткой -->
         <CollectionView x:Name="MedicinesCollection"
                 ItemsSource="{Binding Medicines}"
-                SelectionMode="None"
+                SelectionMode="Single"
+                SelectionChanged="OnMedicineSelected"
                 Grid.Row="0">
 
             <CollectionView.ItemTemplate>
@@ -19,19 +20,28 @@
                         <SwipeView.RightItems>
                             <SwipeItems>
                                 <SwipeItem Text="Удалить"
-                                   BackgroundColor="Red"
-                                   Invoked="OnDeleteMedicine"
-                                   CommandParameter="{Binding .}" />
+                               BackgroundColor="Red"
+                               Invoked="OnDeleteMedicine"
+                               CommandParameter="{Binding .}" />
                             </SwipeItems>
                         </SwipeView.RightItems>
 
                         <Frame BorderColor="LightGray" CornerRadius="10" Padding="10" Margin="5" HasShadow="True">
                             <VerticalStackLayout Spacing="5">
                                 <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="20" />
-                                <Label Text="{Binding DosePerIntake, StringFormat='Доза за приём: {0}'}" FontSize="16" />
+
+                                <!-- Показываем оставшееся количество -->
+                                <Label Text="{Binding StockDescription, StringFormat='Остаток: {0}'}" FontSize="16" />
+
+
+                                <!-- Кол-во приёмов в день -->
                                 <Label Text="{Binding IntakesPerDay, StringFormat='Приёмов в день: {0}'}" FontSize="16" />
-                                <Label Text="{Binding PackageCount, StringFormat='В упаковке: {0} шт.'}" FontSize="16" />
-                                <Label Text="{Binding CourseDays, StringFormat='Хватит на {0} дней'}" FontSize="16" TextColor="DarkGreen" />
+
+                                <!-- Количество дней, на сколько хватит -->
+                                <Label Text="{Binding DaysAvailable, StringFormat='Хватит на {0} дней'}" FontSize="16" TextColor="DarkGreen" />
+
+
+                                <!-- Особые указания -->
                                 <Label Text="{Binding SpecialInstructions, StringFormat='Особые указания: {0}'}" FontSize="14" TextColor="Gray" />
                             </VerticalStackLayout>
                         </Frame>
@@ -39,6 +49,7 @@
                     </SwipeView>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
+
 
         </CollectionView>
 
