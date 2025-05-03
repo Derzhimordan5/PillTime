@@ -1,17 +1,102 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="PillTime.Views.UserProfilePage"
-             Title="Мои данные">
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="PillTime.Views.UserProfilePage"
+    Title="Мои данные"
+    BackgroundColor="#F0F1F7">
 
-    <VerticalStackLayout Padding="20" Spacing="20">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
 
-        <Entry x:Name="GenderEntry" Placeholder="Пол (Мужской/Женский)" />
-        <Entry x:Name="AgeEntry" Placeholder="Возраст" Keyboard="Numeric"/>
-        <Entry x:Name="WeightEntry" Placeholder="Вес (кг)" Keyboard="Numeric"/>
+            <!-- Обёртка для всей формы -->
+            <Frame
+        BackgroundColor="White"
+        BorderColor="#D1C4E9"
+        CornerRadius="20"
+        Padding="20"
+        HasShadow="True">
 
-        <Button Text="Сохранить" Clicked="OnSaveClicked" />
+                <VerticalStackLayout Spacing="25">
 
-    </VerticalStackLayout>
+                    <!-- Пол -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label
+              Text="Пол"
+              FontSize="16"
+              TextColor="#5E35B1" />
+                        <Picker
+              x:Name="GenderPicker"
+              Title="Выберите пол"
+              BackgroundColor="#F5F5FA"
+              TextColor="#333333"
+              FontSize="16">
+                            <Picker.Items>
+                                <x:String>Мужской</x:String>
+                                <x:String>Женский</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </VerticalStackLayout>
 
+                    <!-- Возраст -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label
+              Text="Возраст"
+              FontSize="16"
+              TextColor="#5E35B1" />
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                            <Picker
+                x:Name="AgePicker"
+                Title="–"
+                ItemsSource="{Binding Ages}"
+                BackgroundColor="#F5F5FA"
+                TextColor="#333333"
+                FontSize="16"
+                HorizontalOptions="FillAndExpand" />
+                            <Label
+                Text="лет"
+                FontSize="16"
+                VerticalOptions="Center"
+                TextColor="#333333" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Вес -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label
+              Text="Вес"
+              FontSize="16"
+              TextColor="#5E35B1" />
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                            <Picker
+                x:Name="WeightPicker"
+                Title="–"
+                ItemsSource="{Binding Weights}"
+                BackgroundColor="#F5F5FA"
+                TextColor="#333333"
+                FontSize="16"
+                HorizontalOptions="FillAndExpand" />
+                            <Label
+                Text="кг"
+                FontSize="16"
+                VerticalOptions="Center"
+                TextColor="#333333" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Кнопка Сохранить -->
+            <Button
+        Text="Сохранить"
+        CornerRadius="10"
+        BackgroundColor="#5E35B1"
+        TextColor="White"
+        FontSize="18"
+        Padding="12"
+        Clicked="OnSaveClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

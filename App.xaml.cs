@@ -20,7 +20,7 @@ public partial class App : Application
             MainPage = new Views.UserProfilePage();
         }
 
-        // 💥 Запускаем сброс отметок и пересчёт дней
+        // 💥 Запуск сбросf отметок и пересчёт дней
         ResetMedicinesForNewDay();
     }
 
@@ -31,11 +31,10 @@ public partial class App : Application
 
         if (lastResetDate == today)
         {
-            // Уже сбрасывали сегодня — ничего не делаем
             return;
         }
 
-        // Обновляем дату сброса
+        // Обновление даты сброса
         Preferences.Set("LastResetDate", today);
 
         var medicines = await Database.GetMedicinesAsync();

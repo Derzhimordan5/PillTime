@@ -1,9 +1,5 @@
 using PillTime.Models;
 using Plugin.LocalNotification;
-using System;
-using System.Collections.Generic;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Graphics;
 
 namespace PillTime.Views
 {
@@ -19,11 +15,11 @@ namespace PillTime.Views
         {
             InitializeComponent();
 
-            // Наполняем единицы
+            // Наполнение единиц
             DoctorUnitPicker.ItemsSource = _units;
         }
 
-        // Переключаем блоки в зависимости от выбора режима
+        // Переключение блоков в зависимости от выбора режима
         private void OnModeChanged(object sender, EventArgs e)
         {
             bool isDoctor = ModePicker.SelectedIndex == 0;
@@ -31,7 +27,7 @@ namespace PillTime.Views
             SelfBlock.IsVisible = !isDoctor;
         }
 
-        // При вводе числа приёмов для врача динамически создаём строки
+        // При вводе числа приёмов для врача динамическое создание строк
         private void OnIntakesPerDayChanged(object sender, EventArgs e)
         {
             DoctorScheduleStack.Children.Clear();
@@ -65,7 +61,7 @@ namespace PillTime.Views
             }
         }
 
-        // При вводе числа приёмов для самостоятельного курса создаём строки
+        // Создание строк при вводе числа приёмов для самостоятельного курса 
         private void OnIntakesPerDaySelfChanged(object sender, EventArgs e)
         {
             SelfScheduleStack.Children.Clear();
@@ -246,7 +242,7 @@ namespace PillTime.Views
                     IntakeTimes = times.ToArray(),
                     IntakeDoses = doses.ToArray(),
                     StockAmount = stockSelf,
-                    PackageCount = (int)Math.Floor(stockSelf), // можешь оставить, если нужно старое поведение
+                    PackageCount = (int)Math.Floor(stockSelf), 
                     MaxDailyDosePerKg = maxPerKg,
                     DaysAvailable = daysAvailable,
                     SpecialInstructions = specialInstructions

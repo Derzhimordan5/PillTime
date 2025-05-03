@@ -42,8 +42,12 @@ public partial class CalendarPage : ContentPage
 
     private async Task LoadTodayMedicines()
     {
-        var medicines = await App.Database.GetMedicinesAsync();
-        TodayMedicines = new ObservableCollection<Medicine>(medicines);
+        var all = await App.Database.GetMedicinesAsync();
+        var withStock = all
+            .Where(m => m.StockAmount > 0)
+            .ToList();
+
+        TodayMedicines = new ObservableCollection<Medicine>(withStock);
         OnPropertyChanged(nameof(TodayMedicines));
     }
     protected override async void OnAppearing()

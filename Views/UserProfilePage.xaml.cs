@@ -1,59 +1,78 @@
-using PillTime.Models;
-
-namespace PillTime.Views;
-
-public partial class UserProfilePage : ContentPage
+namespace PillTime.Views
 {
-    private bool _isEditing = false;
-
-    public UserProfilePage(bool isEditing = false)
+    public partial class UserProfilePage : ContentPage
     {
-        InitializeComponent();
-        _isEditing = isEditing;
+        // Диапазоны для Picker-ов
+        private readonly List<string> _ages = Enumerable.Range(1, 120)
+                                                         .Select(i => i.ToString())
+                                                         .ToList();
+        private readonly List<string> _weights = Enumerable.Range(1, 200)
+                                                            .Select(i => i.ToString())
+                                                            .ToList();
 
-        if (_isEditing)
-            LoadUserProfile();
-    }
+        private bool _isEditing;
 
-    private void LoadUserProfile()
-    {
-        GenderEntry.Text = Preferences.Get("Gender", string.Empty);
-        AgeEntry.Text = Preferences.Get("Age", 0).ToString();
-        WeightEntry.Text = Preferences.Get("Weight", 0.0).ToString();
-    }
-
-    private async void OnSaveClicked(object sender, EventArgs e)
-    {
-        var gender = GenderEntry.Text;
-        var ageText = AgeEntry.Text;
-        var weightText = WeightEntry.Text;
-
-        if (string.IsNullOrWhiteSpace(gender) || string.IsNullOrWhiteSpace(ageText) || string.IsNullOrWhiteSpace(weightText))
+        public UserProfilePage(bool isEditing = false)
         {
-            await DisplayAlert("Ошибка", "Пожалуйста, заполните все поля", "ОК");
-            return;
+            InitializeComponent();
+            _isEditing = isEditing;
+
+            // Привязываем диапазоны к Picker-ам
+            AgePicker.ItemsSource = _ages;
+            WeightPicker.ItemsSource = _weights;
+
+            if (_isEditing)
+                LoadUserProfile();
         }
 
-        if (int.TryParse(ageText, out int age) && double.TryParse(weightText, out double weight))
+        void LoadUserProfile()
         {
-            var profile = new UserProfile
-            {
-                Gender = gender,
-                Age = age,
-                Weight = weight
-            };
+            // Пол
+            var savedGender = Preferences.Get("Gender", string.Empty);
+            if (!string.IsNullOrEmpty(savedGender))
+                GenderPicker.SelectedItem = savedGender;
 
-            // Сохраняем профиль локально
-            Preferences.Set("Gender", profile.Gender);
-            Preferences.Set("Age", profile.Age);
-            Preferences.Set("Weight", profile.Weight);
+            // Возраст
+            var age = Preferences.Get("Age", 1);
+            AgePicker.SelectedItem = age.ToString();
+
+            // Вес
+            var weight = Preferences.Get("Weight", 1.0);
+            WeightPicker.SelectedItem = ((int)weight).ToString();
+        }
+
+        private async void OnSaveClicked(object sender, EventArgs e)
+        {
+            // Пол
+            if (GenderPicker.SelectedItem is not string gender)
+            {
+                await DisplayAlert("Ошибка", "Выберите пол", "ОК");
+                return;
+            }
+
+            // Возраст
+            if (AgePicker.SelectedItem is not string ageText
+             || !int.TryParse(ageText, out var age))
+            {
+                await DisplayAlert("Ошибка", "Выберите корректный возраст", "ОК");
+                return;
+            }
+
+            // Вес
+            if (WeightPicker.SelectedItem is not string weightText
+             || !double.TryParse(weightText, out var weight))
+            {
+                await DisplayAlert("Ошибка", "Выберите корректный вес", "ОК");
+                return;
+            }
+
+            // Сохраняем
+            Preferences.Set("Gender", gender);
+            Preferences.Set("Age", age);
+            Preferences.Set("Weight", weight);
 
             // Переход в основное приложение
-            Application.Current.MainPage = new Views.MainTabbedPage();
-        }
-        else
-        {
-            await DisplayAlert("Ошибка", "Возраст и вес должны быть числами", "ОК");
+            Application.Current.MainPage = new MainTabbedPage();
         }
     }
 }

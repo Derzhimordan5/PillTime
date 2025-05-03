@@ -25,22 +25,6 @@ public partial class MedListPage : ContentPage
         }
     }
 
-
-
-
-    private async void OnDeleteMedicine(object sender, EventArgs e)
-    {
-        if (sender is SwipeItem swipeItem && swipeItem.CommandParameter is Medicine selectedMedicine)
-        {
-            bool answer = await DisplayAlert("Удаление", $"Удалить {selectedMedicine.Name}?", "Да", "Нет");
-            if (answer)
-            {
-                await App.Database.DeleteMedicineAsync(selectedMedicine);
-                await ReloadMedicinesAsync();
-            }
-        }
-    }
-
     private async Task ReloadMedicinesAsync()
     {
         Medicines.Clear();
@@ -60,7 +44,7 @@ public partial class MedListPage : ContentPage
         if (e.CurrentSelection.FirstOrDefault() is Medicine selectedMedicine)
         {
             await Navigation.PushAsync(new EditMedicinePage(selectedMedicine));
-            MedicinesCollection.SelectedItem = null;  // сбрасываем выделение
+            MedicinesCollection.SelectedItem = null;  
         }
     }
 

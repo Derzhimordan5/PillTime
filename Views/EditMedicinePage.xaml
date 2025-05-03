@@ -1,87 +1,229 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage
+<ContentPage 
     x:Class="PillTime.Views.EditMedicinePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Редактировать лекарство">
+    Title="Редактировать лекарство"
+    BackgroundColor="#F0F1F7">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="15">
+        <VerticalStackLayout Padding="20" Spacing="20">
 
-            <!-- Название -->
-            <Label Text="Название лекарства" />
-            <Entry x:Name="NameEntry" Placeholder="Например, Парацетамол" />
+            <!-- Заголовок -->
+            <Label 
+                Text="Редактировать лекарство"
+                FontSize="24"
+                FontAttributes="Bold"
+                TextColor="#5E35B1"
+                HorizontalOptions="Center" />
 
-            <!-- Режим приёма -->
-            <Label Text="Режим приёма" />
-            <Picker
-        x:Name="ModePicker"
-        Title="Выберите режим"
-        SelectedIndexChanged="OnModeChanged">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>По назначению врача</x:String>
-                        <x:String>Самостоятельный курс</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
+            <Frame
+                BackgroundColor="White"
+                BorderColor="#D1C4E9"
+                CornerRadius="15"
+                Padding="20"
+                HasShadow="True">
 
-            <!-- По назначению врача -->
-            <VerticalStackLayout x:Name="DoctorBlock" IsVisible="False" Spacing="10">
-                <Label Text="Единица измерения" />
-                <Picker
-          x:Name="DoctorUnitPicker"
-          Title="Выберите единицу" />
+                <VerticalStackLayout Spacing="15">
 
-                <Label Text="Приёмы в день" />
-                <Entry
-          x:Name="IntakesPerDayEntry"
-          Keyboard="Numeric"
-          Placeholder="Число приёмов"
-          Completed="OnIntakesPerDayChanged" />
+                    <!-- Название -->
+                    <Label 
+                        Text="Название лекарства"
+                        FontSize="16"
+                        TextColor="#5E35B1" />
+                    <Entry 
+                        x:Name="NameEntry"
+                        Placeholder="Например, Парацетамол"
+                        BackgroundColor="#F5F5FA"
+                        TextColor="#333333"
+                        FontSize="16" />
 
+                    <!-- Выбор режима приёма -->
+                    <Label 
+                        Text="Режим приёма"
+                        FontSize="16"
+                        TextColor="#5E35B1" />
+                    <Picker
+                        x:Name="ModePicker"
+                        Title="Выберите режим"
+                        SelectedIndexChanged="OnModeChanged"
+                        BackgroundColor="#F5F5FA"
+                        TextColor="#333333"
+                        FontSize="16">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>По назначению врача</x:String>
+                                <x:String>Самостоятельный курс</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+                    </Picker>
 
+                    <!-- Блок «По назначению врача» -->
+                    <Frame
+                        x:Name="DoctorBlock"
+                        IsVisible="False"
+                        BackgroundColor="#FAFAFA"
+                        BorderColor="#E0E0E0"
+                        CornerRadius="12"
+                        Padding="15"
+                        HasShadow="False">
+                        <VerticalStackLayout Spacing="10">
 
-                <Label Text="Время и дозировка" />
-                <ScrollView HeightRequest="150">
-                    <VerticalStackLayout x:Name="DoctorScheduleStack" Spacing="10" />
-                </ScrollView>
+                            <Label 
+                                Text="Единица измерения"
+                                FontSize="14"
+                                TextColor="#5E35B1" />
+                            <Picker
+                                x:Name="DoctorUnitPicker"
+                                Title="Выберите единицу"
+                                BackgroundColor="#F5F5FA"
+                                TextColor="#333333"
+                                FontSize="16" />
 
-                <Label Text="Запас лекарства" />
-                <Entry
-          x:Name="StockEntry"
-          Keyboard="Numeric"
-          Placeholder="Количество в выбранной единице" />
-            </VerticalStackLayout>
+                            <Label 
+                                Text="Приёмы в день"
+                                FontSize="14"
+                                TextColor="#5E35B1" />
+                            <Entry
+                                x:Name="IntakesPerDayEntry"
+                                Keyboard="Numeric"
+                                Placeholder="Число приёмов"
+                                BackgroundColor="#F5F5FA"
+                                TextColor="#333333"
+                                FontSize="16"
+                                Completed="OnIntakesPerDayChanged" />
 
-            <!-- Самостоятельный курс -->
-            <VerticalStackLayout x:Name="SelfBlock" IsVisible="False" Spacing="10">
-                <Label Text="Максимальная норма (мг/кг/сутки)" />
-                <Entry x:Name="MaxDailyDosePerKgEntry" Keyboard="Numeric" Placeholder="например, 60" Unfocused="OnIntakesPerDaySelfChanged" Completed="OnIntakesPerDaySelfChanged" />
+                            <Label 
+                                Text="Время и дозировка"
+                                FontSize="14"
+                                TextColor="#5E35B1" />
+                            <ScrollView HeightRequest="150" BackgroundColor="Violet">
+                                <VerticalStackLayout
+                                  x:Name="DoctorScheduleStack"
+                                  Spacing="10" />
+                            </ScrollView>
 
-                <Label Text="Приёмы в день" />
-                <Entry x:Name="IntakesPerDaySelfEntry" Keyboard="Numeric" Completed="OnIntakesPerDaySelfChanged" Unfocused="OnIntakesPerDaySelfChanged" />
+                            <Label 
+                                Text="Запас лекарства"
+                                FontSize="14"
+                                TextColor="#5E35B1" />
+                            <Entry
+                                x:Name="StockEntry"
+                                Keyboard="Numeric"
+                                Placeholder="Количество в выбранной единице"
+                                BackgroundColor="#F5F5FA"
+                                TextColor="#333333"
+                                FontSize="16" />
 
+                        </VerticalStackLayout>
+                    </Frame>
 
-                <Label Text="Время приёма (доза вычисляется автоматически)" />
-                <ScrollView HeightRequest="150">
-                    <VerticalStackLayout x:Name="SelfScheduleStack" Spacing="10" />
-                </ScrollView>
+                    <!-- Блок «Самостоятельный курс» -->
+                    <Frame
+                        x:Name="SelfBlock"
+                        IsVisible="False"
+                        BackgroundColor="#FAFAFA"
+                        BorderColor="#E0E0E0"
+                        CornerRadius="12"
+                        Padding="15"
+                        HasShadow="False">
+                        <VerticalStackLayout Spacing="10">
 
-                <Label Text="Запас препарата (мг)" />
-                <Entry x:Name="StockSelfEntry" Keyboard="Numeric" Placeholder="например, 5000" />
-            </VerticalStackLayout>
-            <Label Text="Особые указания (например, после еды, запивать водой)" />
-            <Entry x:Name="SpecialInstructionsEntry" Placeholder="Например, после еды" />
+                            <Label 
+                                Text="Максимальная норма (мг/кг/сутки)"
+                                FontSize="14"
+                                TextColor="#5E35B1" />
+                            <Entry
+                                x:Name="MaxDailyDosePerKgEntry"
+                                Keyboard="Numeric"
+                                Placeholder="например, 60"
+                                BackgroundColor="#F5F5FA"
+                                TextColor="#333333"
+                                FontSize="16"
+                                Unfocused="OnIntakesPerDaySelfChanged"
+                                Completed="OnIntakesPerDaySelfChanged" />
 
-            <Button
-        Text="Сохранить"
-        FontAttributes="Bold"
-        Clicked="OnSaveClicked" />
-            <Button Text="Удалить"
-        BackgroundColor="Red"
-        TextColor="White"
-        Clicked="OnDeleteClicked" />
+                            <Label 
+                                Text="Приёмы в день"
+                                FontSize="14"
+                                TextColor="#5E35B1" />
+                            <Entry
+                                x:Name="IntakesPerDaySelfEntry"
+                                Keyboard="Numeric"
+                                Placeholder="Число приёмов"
+                                BackgroundColor="#F5F5FA"
+                                TextColor="#333333"
+                                FontSize="16"
+                                Completed="OnIntakesPerDaySelfChanged"
+                                Unfocused="OnIntakesPerDaySelfChanged" />
+
+                            <Label 
+                                Text="Время приёма (доза вычисляется автоматически)"
+                                FontSize="14"
+                                TextColor="#5E35B1" />
+                            <ScrollView HeightRequest="150" BackgroundColor="Violet">
+                                <VerticalStackLayout
+                                  x:Name="SelfScheduleStack"
+                                  Spacing="10" />
+                            </ScrollView>
+
+                            <Label 
+                                Text="Запас препарата (мг)"
+                                FontSize="14"
+                                TextColor="#5E35B1" />
+                            <Entry
+                                x:Name="StockSelfEntry"
+                                Keyboard="Numeric"
+                                Placeholder="например, 5000"
+                                BackgroundColor="#F5F5FA"
+                                TextColor="#333333"
+                                FontSize="16" />
+
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Особые указания -->
+                    <Label 
+                        Text="Особые указания (например, после еды, запивать водой)"
+                        FontSize="14"
+                        TextColor="#5E35B1" />
+                    <Entry
+                        x:Name="SpecialInstructionsEntry"
+                        Placeholder="Например, после еды"
+                        BackgroundColor="#F5F5FA"
+                        TextColor="#333333"
+                        FontSize="16" />
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Кнопки -->
+            <HorizontalStackLayout  
+                Spacing="10"
+                Padding="20,0"
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
+
+                <Button
+                    Text="💾 Сохранить"
+                    FontAttributes="Bold"
+                    BackgroundColor="#5E35B1"
+                    TextColor="White"
+                    CornerRadius="8"
+                    Padding="12"
+                    WidthRequest="140"
+                    Clicked="OnSaveClicked" />
+
+                <Button
+                    Text="🗑️ Удалить"
+                    BackgroundColor="#E57373"
+                    TextColor="White"
+                    CornerRadius="8"
+                    Padding="12"
+                    WidthRequest="140"
+                    Clicked="OnDeleteClicked" />
+
+            </HorizontalStackLayout>
 
 
         </VerticalStackLayout>

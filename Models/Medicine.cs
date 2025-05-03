@@ -10,10 +10,8 @@ namespace PillTime.Models
         public string Name { get; set; }                  // Название лекарства
         public int PackageCount { get; set; }            // Кол-во упаковок или дней, на сколько хватит
         public string DosePerIntake { get; set; }        // Доза за приём (текст)
-        public string TimesPerDay { get; set; }          // Старая строка (оставить для совместимости, но можно больше не использовать)
         public string SpecialInstructions { get; set; } // Особые указания
         public bool IsTakenToday { get; set; }          // Отмечено ли на сегодня
-        public string IntakeStatus { get; set; }        // Статус приёмов (например, ✔,✖)
 
         public string Unit { get; set; }               // Единица измерения
         public int IntakesPerDay { get; set; }         // Количество приёмов в день

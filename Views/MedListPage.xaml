@@ -1,70 +1,87 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="PillTime.Views.MedListPage"
-             Title="Лекарства"
-             BackgroundColor="White">
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="PillTime.Views.MedListPage"
+    Title="Лекарства"
+    BackgroundColor="#F0F1F7">
 
-    <Grid RowDefinitions="*, Auto" Padding="20" RowSpacing="15">
+    <Grid Padding="20" RowSpacing="20" RowDefinitions="*, Auto">
 
-        <!-- Список лекарств с прокруткой -->
-        <CollectionView x:Name="MedicinesCollection"
-                ItemsSource="{Binding Medicines}"
-                SelectionMode="Single"
-                SelectionChanged="OnMedicineSelected"
-                Grid.Row="0">
+        <!-- Список лекарств -->
+        <CollectionView
+      x:Name="MedicinesCollection"
+      ItemsSource="{Binding Medicines}"
+      SelectionMode="Single"
+      SelectionChanged="OnMedicineSelected"
+      Grid.Row="0">
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <SwipeView>
-                        <SwipeView.RightItems>
-                            <SwipeItems>
-                                <SwipeItem Text="Удалить"
-                               BackgroundColor="Red"
-                               Invoked="OnDeleteMedicine"
-                               CommandParameter="{Binding .}" />
-                            </SwipeItems>
-                        </SwipeView.RightItems>
 
-                        <Frame BorderColor="LightGray" CornerRadius="10" Padding="10" Margin="5" HasShadow="True">
-                            <VerticalStackLayout Spacing="5">
-                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="20" />
+                        <Frame
+              BackgroundColor="White"
+              CornerRadius="15"
+              Padding="15"
+              Margin="5"
+              HasShadow="True">
 
-                                <!-- Показываем оставшееся количество -->
-                                <Label Text="{Binding StockDescription, StringFormat='Остаток: {0}'}" FontSize="16" />
+                            <HorizontalStackLayout Spacing="15" VerticalOptions="Center">
+                                <!-- Иконка лекарства -->
+                                <Label
+                  Text="💊"
+                  FontSize="32"
+                  VerticalOptions="Center" />
 
+                                <VerticalStackLayout Spacing="4" VerticalOptions="CenterAndExpand">
+                                    <!-- Название -->
+                                    <Label
+                    Text="{Binding Name}"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    TextColor="#5E35B1" />
 
-                                <!-- Кол-во приёмов в день -->
-                                <Label Text="{Binding IntakesPerDay, StringFormat='Приёмов в день: {0}'}" FontSize="16" />
+                                    <!-- Остаток -->
+                                    <Label
+                    Text="{Binding StockDescription, StringFormat='Остаток: {0}'}"
+                    FontSize="14"
+                    TextColor="#6A1B9A" />
 
-                                <!-- Количество дней, на сколько хватит -->
-                                <Label Text="{Binding DaysAvailable, StringFormat='Хватит на {0} дней'}" FontSize="16" TextColor="DarkGreen" />
+                                    <!-- Приёмов в день -->
+                                    <Label
+                    Text="{Binding IntakesPerDay, StringFormat='Приёмов в день: {0}'}"
+                    FontSize="14"
+                    TextColor="#6A1B9A" />
 
+                                    <!-- Дней хватит -->
+                                    <Label
+                    Text="{Binding DaysAvailable, StringFormat='Хватит на {0} дней'}"
+                    FontSize="14"
+                    TextColor="#388E3C" />
 
-                                <!-- Особые указания -->
-                                <Label Text="{Binding SpecialInstructions, StringFormat='Особые указания: {0}'}" FontSize="14" TextColor="Gray" />
-                            </VerticalStackLayout>
+                                    <!-- Особые указания -->
+                                    <Label
+                    Text="{Binding SpecialInstructions, StringFormat='Особые указания: {0}'}"
+                    FontSize="14"
+                    TextColor="#757575" />
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
                         </Frame>
-
                     </SwipeView>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-
-
         </CollectionView>
 
-
         <!-- Кнопка добавления -->
-        <Button Text="Добавить лекарство"
-            FontSize="18"
-            Clicked="OnNavigateToAddMedicinePage"
-            BackgroundColor="#4CAF50"
-            TextColor="White"
-            CornerRadius="10"
-            Grid.Row="1"/>
-
+        <Button
+      Text="➕ Добавить лекарство"
+      Grid.Row="1"
+      CornerRadius="25"
+      BackgroundColor="#5E35B1"
+      TextColor="White"
+      FontSize="18"
+      Clicked="OnNavigateToAddMedicinePage"
+      Padding="15,10" />
     </Grid>
-
-
 </ContentPage>
-
