@@ -1,4 +1,5 @@
 using PillTime.Models;
+using Plugin.LocalNotification;
 using System;
 using System.Collections.Generic;
 using Microsoft.Maui.Controls;
@@ -31,18 +32,12 @@ namespace PillTime.Views
             MaxDailyDosePerKgEntry.Text = _medicine.MaxDailyDosePerKg.ToString();
             SpecialInstructionsEntry.Text = _medicine.SpecialInstructions;
 
-            // показываем блоки
             OnModeChanged(null, null);
 
-            // заполняем расписания
             if (_medicine.Unit == "мг")
-            {
                 OnIntakesPerDaySelfChanged(null, null);
-            }
             else
-            {
                 OnIntakesPerDayChanged(null, null);
-            }
         }
 
         private void OnModeChanged(object sender, EventArgs e)
@@ -137,13 +132,10 @@ namespace PillTime.Views
             _medicine.Name = NameEntry.Text?.Trim();
             _medicine.SpecialInstructions = SpecialInstructionsEntry.Text?.Trim();
 
-
             if (ModePicker.SelectedIndex == 0)
             {
                 _medicine.Unit = DoctorUnitPicker.SelectedItem as string;
                 _medicine.IntakesPerDay = int.TryParse(IntakesPerDayEntry.Text, out var ipd) ? ipd : 0;
-                
-
 
                 var times = new List<string>();
                 var doses = new List<string>();
@@ -170,8 +162,6 @@ namespace PillTime.Views
                 _medicine.IntakesPerDay = int.TryParse(IntakesPerDaySelfEntry.Text, out var ipd) ? ipd : 0;
                 _medicine.MaxDailyDosePerKg = double.TryParse(MaxDailyDosePerKgEntry.Text?.Replace(',', '.'), System.Globalization.NumberStyles.Any,
                     System.Globalization.CultureInfo.InvariantCulture, out var maxPerKg) ? maxPerKg : 0;
-                
-
 
                 var times = new List<string>();
                 var doses = new List<string>();
@@ -195,7 +185,11 @@ namespace PillTime.Views
             }
 
             _medicine.RecalculateDaysAvailable();
+
+            CancelMedicineNotifications();
             await App.Database.SaveMedicineAsync(_medicine);
+            ScheduleMedicineNotifications(_medicine.Name, _medicine.IntakeTimes.ToList());
+
             await DisplayAlert("Сохранено", "Лекарство обновлено", "ОК");
             await Navigation.PopAsync();
         }
@@ -205,9 +199,50 @@ namespace PillTime.Views
             bool confirm = await DisplayAlert("Удалить", "Вы уверены, что хотите удалить это лекарство?", "Да", "Нет");
             if (confirm)
             {
+                CancelMedicineNotifications();
                 await App.Database.DeleteMedicineAsync(_medicine);
                 await DisplayAlert("Удалено", "Лекарство удалено", "ОК");
                 await Navigation.PopAsync();
+            }
+        }
+
+        private void CancelMedicineNotifications()
+        {
+            int id = 1000;
+            foreach (var t in _medicine.IntakeTimes)
+            {
+                if (TimeSpan.TryParse(t, out _))
+                {
+                    Plugin.LocalNotification.NotificationCenter.Current.Cancel(id++);
+                }
+            }
+        }
+
+        private void ScheduleMedicineNotifications(string medicineName, List<string> intakeTimes)
+        {
+            int id = 1000;
+            foreach (var t in intakeTimes)
+            {
+                if (TimeSpan.TryParse(t, out var time))
+                {
+                    var now = DateTime.Now;
+                    var notifyAt = DateTime.Today.Add(time);
+                    if (notifyAt <= now)
+                        notifyAt = notifyAt.AddDays(1);
+
+                    var req = new NotificationRequest
+                    {
+                        NotificationId = id++,
+                        Title = "Приём лекарства",
+                        Description = $"Пора принять {medicineName}",
+                        Schedule = new NotificationRequestSchedule
+                        {
+                            NotifyTime = notifyAt,
+                            RepeatType = NotificationRepeat.Daily
+                        }
+                    };
+                    Plugin.LocalNotification.NotificationCenter.Current.Show(req);
+                }
             }
         }
     }

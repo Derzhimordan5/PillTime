@@ -242,7 +242,7 @@ namespace PillTime.Views
                     IntakeTimes = times.ToArray(),
                     IntakeDoses = doses.ToArray(),
                     StockAmount = stockSelf,
-                    PackageCount = (int)Math.Floor(stockSelf), 
+                    PackageCount = (int)Math.Floor(stockSelf),
                     MaxDailyDosePerKg = maxPerKg,
                     DaysAvailable = daysAvailable,
                     SpecialInstructions = specialInstructions
